@@ -1,0 +1,7 @@
+# Basura de sistema operativo / editor — aplica a todo el repo, sin importar la subcarpeta
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo

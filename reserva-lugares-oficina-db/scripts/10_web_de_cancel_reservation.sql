@@ -1,4 +1,5 @@
--- Cancela una reserva (is_active = FALSE) validando que pertenezca al usuario indicado.
+-- Cancela una reserva (is_active = FALSE, is_deleted = TRUE, deleted_at = ahora)
+-- validando que pertenezca al usuario indicado. No borra el registro (sigue siendo un UPDATE).
 
 DROP PROCEDURE IF EXISTS web_de_cancel_reservation;
 
@@ -32,7 +33,9 @@ BEGIN
     SET MESSAGE_TEXT = 'La reserva no pertenece al usuario indicado.';
     END IF; START TRANSACTION;
  
-    UPDATE dbo_reservations SET is_active = FALSE WHERE id = p_reservation_id;
+    UPDATE dbo_reservations
+    SET is_active = FALSE, is_deleted = TRUE, deleted_at = CURRENT_TIMESTAMP
+    WHERE id = p_reservation_id;
 
     COMMIT;
     SELECT p_reservation_id AS reservation_id;

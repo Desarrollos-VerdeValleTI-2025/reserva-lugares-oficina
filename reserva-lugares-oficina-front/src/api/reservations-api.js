@@ -1,8 +1,8 @@
 import httpClient from './httpClient';
-import { MOCK_USER_EMAIL } from '../constants/user';
 
+// userEmail ya no se manda por query — el backend lo obtiene del token (Actividad 4).
 export const getMyReservations = async () => {
-    return httpClient.get('reservations/me', {params: { userEmail: MOCK_USER_EMAIL } });
+    return httpClient.get('reservations/me');
 };
 
 export const createReservation = async ({ seatId, date }) => {
