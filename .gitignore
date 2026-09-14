@@ -5,7 +5,3 @@ Thumbs.db
 !.vscode/extensions.json
 .idea
 *.suo
-
-# Documentación técnica generada localmente (agente de documentación) — solo local, no se versiona
-/knowledge/
-/docs/
