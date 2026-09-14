@@ -28,16 +28,32 @@ function Inicio(){
 
     const cargarReservas = async () => {
         try {
-            setError(null);
             const data = await getMyReservations();
             setReservations(data);
+            setError(null);
         } catch (err) {
             setError(err.message);
         }
     };
 
     useEffect(() => {
-        cargarReservas();
+        // Lógica inline (no una llamada directa a cargarReservas) para que el estado solo
+        // se actualice dentro de la respuesta async, nunca de forma síncrona en el efecto.
+        let ignorar = false;
+        (async () => {
+            try {
+                const data = await getMyReservations();
+                if (!ignorar) {
+                    setReservations(data);
+                    setError(null);
+                }
+            } catch (err) {
+                if (!ignorar) setError(err.message);
+            }
+        })();
+        return () => {
+            ignorar = true;
+        };
     }, []);
 
     if (error) {

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
+const logger = require('../config/logger');
 
 const client = jwksClient({
   jwksUri: `https://login.microsoftonline.com/${process.env.AZURE_AD_TENANT_ID}/discovery/v2.0/keys`,
@@ -42,7 +43,9 @@ const authMiddleware = (req, res, next) => {
     algorithms: ['RS256']
   }, (err, decoded) => {
     if (err) {
-      console.log('DEBUG jwt.verify error ->', err.name, '-', err.message);
+      // logger.debug: solo se imprime en desarrollo (nivel 'debug'); en calidad/producción
+      // el logger corre en nivel 'info' y este detalle queda fuera de logs/consola.
+      logger.debug('JWT verification failed', { errorName: err.name, errorMessage: err.message });
       return res.status(401).json({
         success: false,
         error: {
