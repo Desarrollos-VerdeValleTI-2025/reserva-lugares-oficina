@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Documento Técnico (Revisión) — Reserva de Lugares de Oficina</title>
+<style>
+  :root {
+    --verde: #00AE42;
+    --amarillo: #FFED00;
+    --blanco: #FFFFFF;
+    --fondo: #F2F2F2;
+    --texto: #333333;
+    --texto-sec: #797979;
+    --borde: #DDDDDD;
+    --th-bg: #00AE42;
+    --th-texto: #FFFFFF;
+    --info-bg: #FFF9C4;
+    --warning-bg: #FDECEA;
+    --pendiente-bg: #EAF3FF;
+    --riesgo-alto: #EC5956;
+    --riesgo-medio: #B86E00;
+    --riesgo-bajo: #367AD9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+    background: var(--fondo);
+    color: var(--texto);
+    margin: 0;
+    padding: 0;
+    line-height: 1.55;
+  }
+  .page-break { page-break-before: always; }
+  h1, h2, h3, h4 { color: var(--texto); }
+  h2 { border-bottom: 3px solid var(--verde); padding-bottom: 6px; margin-top: 0; }
+  h3 { border-left: 5px solid var(--verde); padding-left: 10px; }
+  a { color: #1a6f34; }
+
+  .cover {
+    background: var(--verde);
+    color: var(--blanco);
+    padding: 60px 50px;
+    min-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .cover .tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.5);
+    color: #FFFFFF;
+    font-weight: bold;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    margin-bottom: 22px;
+    width: fit-content;
+  }
+  .cover h1 { font-size: 40px; margin: 0 0 6px 0; color: var(--blanco); }
+  .cover h2 { border: none; color: #000000; font-weight: 400; font-size: 20px; margin-bottom: 30px; }
+  .document-meta {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 10px;
+    padding: 22px 26px;
+    max-width: 560px;
+  }
+  .document-meta table { width: 100%; border-collapse: collapse; }
+  .document-meta td { padding: 5px 4px; font-size: 14px; color: #000000; }
+  .document-meta td:first-child { font-weight: bold; width: 40%; }
+  .cover .confidential {
+    margin-top: 26px;
+    font-size: 13px;
+    color: #000000;
+    font-style: italic;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 30px; }
+
+  .toc { background: var(--blanco); border: 1px solid var(--borde); border-radius: 10px; padding: 24px 30px; }
+  .toc ul { columns: 2; -webkit-columns: 2; list-style: none; padding-left: 0; }
+  .toc li { margin-bottom: 6px; }
+  .toc a { text-decoration: none; }
+
+  .legend-box {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    padding: 20px 26px;
+    margin-bottom: 20px;
+  }
+  .legend-box ul { margin: 6px 0 0 0; padding-left: 20px; }
+  .legend-tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-right: 6px;
+  }
+  .tag-validado { background: #DFF5E5; color: #1a6f34; }
+  .tag-usuario { background: var(--pendiente-bg); color: #1d4e89; }
+  .tag-noencontrado { background: var(--warning-bg); color: #B42318; }
+  .tag-probable { background: var(--info-bg); color: #8a6d00; }
+
+  .section {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-bottom: 26px;
+  }
+  .section h2 { margin-top: 0; }
+  .subsection { margin-top: 22px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13.5px; }
+  th, td { border: 1px solid var(--borde); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--th-bg); color: var(--th-texto); }
+  tr:nth-child(even) td { background: #FAFAFA; }
+
+  .revision-table th { background: var(--th-bg); color: var(--th-texto); }
+
+  .info-box {
+    margin: 14px 0;
+    font-size: 13.5px;
+    color: var(--texto-sec);
+  }
+  .warning-box {
+    background: var(--warning-bg);
+    border: 1px solid #F0B4AE;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 13.5px;
+  }
+  .missing-box {
+    background: #F5F5F5;
+    border: 1px dashed #999999;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 13.5px;
+    color: var(--texto-sec);
+  }
+
+  .review-required {
+    border: 2px solid #EC5956;
+    background: #FDECEA;
+    color: #333333;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+  }
+  .review-required strong {
+    color: #B42318;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+  .review-required p { margin: 6px 0 0 0; font-size: 13.5px; }
+
+  .review-badge {
+    display: inline-block;
+    background: #EC5956;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 999px;
+    margin-left: 8px;
+  }
+
+  .review-summary-table th { background: #00AE42; color: #FFFFFF; }
+
+  .impact-high, .risk-high { color: #B42318; font-weight: bold; }
+  .impact-medium, .risk-medium { color: #B86E00; font-weight: bold; }
+  .impact-low, .risk-low { color: #367AD9; font-weight: bold; }
+
+  .footer-note {
+    text-align: center;
+    color: var(--texto-sec);
+    font-size: 12px;
+    padding: 24px 10px 40px 10px;
+  }
+
+  code, pre { font-family: Consolas, "Courier New", monospace; }
+  pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+  code.inline { background: #EFEFEF; padding: 1px 5px; border-radius: 4px; color: #B42318; }
+
+  .badge-nivel { font-size: 11px; padding: 2px 7px; border-radius: 5px; font-weight: bold; }
+  .nivel-alta { background:#DFF5E5; color:#1a6f34; }
+  .nivel-media { background:#FFF3CD; color:#8a6d00; }
+
+  .estado-resuelto { color: #1a6f34; font-weight: bold; }
+  .estado-na { color: #797979; font-weight: bold; }
+  .estado-pendiente { color: #B42318; font-weight: bold; }
+  .resolved-note {
+    background: #DFF5E5;
+    border: 1px solid #9CD9B2;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 13.5px;
+  }
+  .resolved-note strong { color: #1a6f34; text-transform: uppercase; font-size: 13px; }
+
+  @media print {
+    .cover { min-height: auto; }
+    .section { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== PORTADA ===================== -->
+<div class="cover">
+  <span class="tag">DOCUMENTO INTERNO DE REVISIÓN</span>
+  <h1>Documento Técnico</h1>
+  <h2>Reserva de Lugares de Oficina (reserva-lugares-oficina)</h2>
+  <div class="document-meta">
+    <table>
+      <tr><td>Versión</td><td>1.4 (borrador de revisión — sin huecos de información pendientes; sin ningún riesgo técnico en estado "Pendiente")</td></tr>
+      <tr><td>Fecha</td><td>10 de septiembre de 2026</td></tr>
+      <tr><td>Autor</td><td>Agente de documentación técnica (Claude), a partir de análisis de código y contexto proporcionado por practicantedes@verdevalle.com</td></tr>
+      <tr><td>Revisó</td><td>No fue posible determinar esta información.</td></tr>
+      <tr><td>Estado</td><td>Borrador / En revisión</td></tr>
+      <tr><td>Repositorio</td><td>C:\Desarrollos\reserva-lugares-oficina\reserva-lugares-oficina</td></tr>
+    </table>
+  </div>
+  <p class="confidential">Confidencial – Uso interno. Este documento es una herramienta de revisión para el equipo de desarrollo y <strong>no debe considerarse el entregable técnico final</strong> mientras existan marcadores "⚠ Requiere revisión".</p>
+</div>
+
+<div class="container">
+
+<!-- ===================== HISTORIAL DE REVISIONES ===================== -->
+<div class="section" id="historial">
+  <h2>Historial de Revisiones</h2>
+  <table class="revision-table">
+    <tr><th>Versión</th><th>Fecha</th><th>Motivo del cambio</th><th>Autor</th><th>Revisó</th></tr>
+    <tr>
+      <td>1.0</td>
+      <td>2026-09-09</td>
+      <td>Versión inicial de documentación técnica generada a partir de análisis del proyecto (código fuente + contexto funcional proporcionado por el desarrollador).</td>
+      <td>Agente de documentación técnica (Claude)</td>
+      <td>Pendiente</td>
+    </tr>
+    <tr>
+      <td>1.1</td>
+      <td>2026-09-10</td>
+      <td>El desarrollador respondió 11 de los 15 huecos de <code class="inline">INFORMATION_GAPS.md</code> (GAP-01 a GAP-10 y GAP-12), marcados como Resuelto o N/A. Se actualizó contenido de las secciones 2.2, 2.3, 3.1, 3.2, 4.3, 4.4, 6.1, 6.2, 6.3, 6.4, 7.1, 7.2, 7.3, 7.4, 8.1, 9 y el Anexo A, quitando marcadores "⚠ Requiere revisión" ya resueltos, y se aplicó ajuste de color en la portada. GAP-11, GAP-13, GAP-14 y GAP-15 siguen pendientes.</td>
+      <td>Agente de documentación técnica (Claude)</td>
+      <td>Pendiente</td>
+    </tr>
+    <tr>
+      <td>1.2</td>
+      <td>2026-09-10</td>
+      <td>El desarrollador respondió los 4 huecos restantes de <code class="inline">INFORMATION_GAPS.md</code> (GAP-11, GAP-13, GAP-14, GAP-15) y confirmó como N/A explícito la ausencia de criterios de aceptación (8.2). GAP-11 correspondía a una corrección de código ya aplicada (<code class="inline">console.log</code> → <code class="inline">logger.debug</code> en <code class="inline">authMiddleware.js</code>), verificada por lectura directa del archivo sin modificarlo. Se actualizaron las secciones 6.1, 7.1, 5.1, 8.2, 9 y el Anexo A, quitando los últimos bloques "⚠ Requiere revisión" abiertos. <strong>El documento queda sin marcadores "⚠ Requiere revisión" pendientes de decisión del desarrollador.</strong></td>
+      <td>Agente de documentación técnica (Claude)</td>
+      <td>Pendiente</td>
+    </tr>
+    <tr>
+      <td>1.3</td>
+      <td>2026-09-10</td>
+      <td>Se corrigieron en código los 2 últimos riesgos técnicos de impacto medio que permanecían sin decisión ni acción (<code class="inline">knowledge/RISKS.md</code> R8 — rate limiting, y R9 — rotación de logs). Verificado por lectura directa: <code class="inline">app.js</code> ahora monta <code class="inline">apiLimiter</code> (<code class="inline">express-rate-limit</code>, 300 solicitudes/15 min por IP) sobre <code class="inline">/api</code> antes del <code class="inline">authMiddleware</code>; <code class="inline">config/logger.js</code> usa <code class="inline">winston-daily-rotate-file</code> (<code class="inline">maxSize: '20m'</code>, <code class="inline">maxFiles: '14d'</code>). Se actualizaron las secciones 6.1, 7.4 y 9. <strong>No queda ningún riesgo de impacto Alto en estado "Pendiente"; queda un riesgo de impacto Medio (R11, versiones mayores de dependencias) y uno de impacto Bajo (R15, SemVer) en estado "Pendiente", sin decisión tomada por el equipo.</strong></td>
+      <td>Agente de documentación técnica (Claude)</td>
+      <td>Pendiente</td>
+    </tr>
+    <tr>
+      <td>1.4</td>
+      <td>2026-09-10</td>
+      <td>Cierre de ciclo de documentación: se cerraron los 2 últimos riesgos que permanecían en estado "Pendiente" en <code class="inline">knowledge/RISKS.md</code> (R11 — dependencias en versiones mayores recientes, R15 — sin SemVer) y se registró un nuevo hallazgo (R16). El desarrollador corrió <code class="inline">npm outdated</code>/<code class="inline">npm update</code> en front y api, actualizando todo dentro de las mismas versiones mayores ya en uso (sin saltar de mayor); R11 pasa a <strong>Mitigado</strong> (el riesgo de fondo de estar en mayores recientes se mantiene, pero ya no hay desfase de parches/minor). R15 pasa a <strong>Resuelto</strong> (versión del front actualizada de <code class="inline">0.0.0</code> a <code class="inline">1.0.0</code>). Se encontró y corrigió un error real de ESLint (<code class="inline">react-hooks/set-state-in-effect</code>) preexistente en <code class="inline">src/pages/Inicio.jsx</code>, no relacionado con la actualización de dependencias (nuevo riesgo R16, ya <strong>Resuelto</strong>). Todo verificado por lectura directa de código y ejecución de <code class="inline">npm run lint</code> en esta sesión, sin modificar código fuente. <strong>Con esta pasada, no queda ningún riesgo en `RISKS.md` en estado "Pendiente".</strong></td>
+      <td>Agente de documentación técnica (Claude)</td>
+      <td>Pendiente</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ===================== LEYENDA DE CONFIANZA ===================== -->
+<div class="legend-box" id="leyenda">
+  <h3 style="margin-top:0;">Leyenda de confianza</h3>
+  <ul>
+    <li><span class="legend-tag tag-validado">Validado por código</span> Información encontrada directamente en archivos del proyecto.</li>
+    <li><span class="legend-tag tag-usuario">Proporcionado por usuario</span> Información declarada en el contexto funcional entregado por el desarrollador responsable.</li>
+    <li><span class="legend-tag tag-noencontrado">No encontrado</span> Información no disponible ni en código ni en el contexto proporcionado.</li>
+    <li><span class="legend-tag tag-probable">Probable</span> Inferencia razonable basada en la estructura del proyecto, no confirmada explícitamente. <strong>No se usa en secciones críticas</strong> (seguridad, base de datos, despliegue, cumplimiento, backup, autenticación, autorización) — en esas secciones, ante falta de evidencia, se usa "No encontrado" + marcador de revisión.</li>
+  </ul>
+</div>
+
+<!-- ===================== ÍNDICE ===================== -->
+<div class="toc" id="indice">
+  <h3 style="margin-top:0;">Índice</h3>
+  <ul>
+    <li><a href="#s1">1. Descripción del Sistema</a></li>
+    <li><a href="#s2">2. Arquitectura</a></li>
+    <li><a href="#s3">3. Requisitos</a></li>
+    <li><a href="#s4">4. Base de Datos</a></li>
+    <li><a href="#s5">5. APIs e Interfaces</a></li>
+    <li><a href="#s6">6. Seguridad</a></li>
+    <li><a href="#s7">7. Configuración y Despliegue</a></li>
+    <li><a href="#s8">8. Pruebas</a></li>
+    <li><a href="#s9">9. Riesgos</a></li>
+    <li><a href="#s10">10. Referencias y Glosario</a></li>
+    <li><a href="#s11">11. Aprobaciones</a></li>
+    <li><a href="#anexoA">Anexo A — Información que requiere revisión</a></li>
+  </ul>
+</div>
+
+<!-- ===================== 1. DESCRIPCIÓN DEL SISTEMA ===================== -->
+<div class="section" id="s1">
+  <h2>1. Descripción del Sistema</h2>
+
+  <div class="subsection">
+    <h3>1.1 Descripción general</h3>
+    <p><strong>¿Qué es?</strong> Una aplicación web interna de Verde Valle que permite a los empleados reservar un lugar/asiento físico de trabajo en la oficina para una fecha específica. <span class="legend-tag tag-usuario">Proporcionado por usuario</span></p>
+    <p><strong>¿Para qué sirve / qué problema resuelve?</strong> Evita conflictos de asignación de espacios físicos de oficina y da visibilidad de disponibilidad por fecha. <span class="legend-tag tag-usuario">Proporcionado por usuario</span></p>
+    <p><strong>¿Cómo encaja en el ecosistema tecnológico?</strong> Es un proyecto autocontenido (front + API + base de datos propios) que se integra únicamente con Microsoft Entra ID (Azure AD) para autenticación corporativa; no se integra con otros sistemas internos de Verde Valle (ERP, RH, etc.). Los README del propio repositorio indican explícitamente que es un <strong>proyecto simulado para capacitación</strong>, sin conexión con sistemas de producción reales. <span class="legend-tag tag-validado">Validado por código</span></p>
+    <p><strong>¿Qué tipo de solución es?</strong> Aplicación web de 3 capas: SPA (React) + API REST interna (Node/Express) + base de datos relacional propia (MySQL). No es un job, ni un servicio de integración, ni microservicios. <span class="legend-tag tag-validado">Validado por código</span></p>
+    <p><strong>¿Quiénes son los usuarios principales?</strong> Empleados de Verde Valle que necesitan reservar un lugar de trabajo en la oficina, autenticados con su cuenta corporativa. No existen roles diferenciados (ver sección 6). <span class="legend-tag tag-usuario">Proporcionado por usuario</span> <span class="legend-tag tag-validado">Validado por código</span></p>
+  </div>
+
+  <div class="subsection">
+    <h3>1.2 Objetivos</h3>
+    <table>
+      <tr><th>Objetivo</th><th>Origen</th></tr>
+      <tr><td>Permitir a los empleados reservar un lugar de trabajo en la oficina para una fecha específica.</td><td>Contexto usuario</td></tr>
+      <tr><td>Evitar conflictos de asignación de espacios físicos de oficina.</td><td>Contexto usuario</td></tr>
+      <tr><td>Dar visibilidad de disponibilidad de asientos por fecha.</td><td>Contexto usuario</td></tr>
+      <tr><td>Garantizar trazabilidad de reservas mediante cancelación lógica en vez de borrado físico.</td><td>Contexto usuario + Código</td></tr>
+      <tr><td>Mantener un contrato de datos estable entre frontend y backend desde la primera iteración del proyecto.</td><td>Contexto usuario + Código</td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <h3>1.3 Integraciones y contexto</h3>
+    <p>La única integración externa real detectada es <strong>Microsoft Entra ID / Azure AD</strong> (vía MSAL en el front y verificación JWT en el backend), usada exclusivamente para autenticación e identidad. No se encontró evidencia de integraciones con SAP, Oracle, SMTP, storage externo, colas/brokers, ni servicios REST/SOAP de terceros adicionales. Detalle completo en <code class="inline">knowledge/INTEGRATIONS.md</code>. <span class="legend-tag tag-validado">Validado por código</span></p>
+    <table>
+      <tr><th>Sistema externo</th><th>Rol</th><th>Fuente</th></tr>
+      <tr><td>Microsoft Entra ID (Azure AD)</td><td>Proveedor de identidad — login SSO y validación de tokens (2 App Registrations: front SPA + API)</td><td>Código</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== 2. ARQUITECTURA ===================== -->
+<div class="section" id="s2">
+  <h2>2. Arquitectura</h2>
+
+  <div class="subsection">
+    <h3>2.1 Estilo Arquitectónico</h3>
+    <p>Arquitectura <strong>cliente-servidor de 3 capas</strong>: SPA (frontend) → API REST interna (backend) → base de datos relacional propia (MySQL), accedida exclusivamente vía stored procedures. No es un monolito de proceso único (front y backend son despliegues independientes), no es microservicios (un solo servicio backend), no es event-driven (sin colas/brokers), y no hay evidencia de jobs/workers. La autenticación sigue el patrón "SPA + API protegida por OAuth2/OIDC", con audiencias separadas para front y backend (dos App Registrations de Azure AD). <span class="legend-tag tag-validado">Validado por código</span></p>
+  </div>
+
+  <div class="subsection">
+    <h3>2.2 Componentes Principales</h3>
+    <p>Solo se documentan aquí componentes <strong>propios</strong> del proyecto. Las dependencias externas (Azure AD) se documentan en la sección 5.3 y en <code class="inline">knowledge/INTEGRATIONS.md</code>.</p>
+    <table>
+      <tr><th>Componente</th><th>Tipo</th><th>Responsabilidad</th><th>Archivos / Evidencia</th><th>¿Propio?</th></tr>
+      <tr><td>reserva-lugares-oficina-front</td><td>Web SPA</td><td>Interfaz de usuario: login, mapa de asientos, gestión de "mi reserva"</td><td><code class="inline">src/App.jsx</code>, <code class="inline">src/pages/</code>, <code class="inline">src/components/SeatMap.jsx</code></td><td>Sí</td></tr>
+      <tr><td>reserva-lugares-oficina-api</td><td>API interna</td><td>Expone endpoints REST protegidos, valida entradas, orquesta llamadas a MySQL</td><td><code class="inline">src/app.js</code>, <code class="inline">src/routes/</code>, <code class="inline">src/controllers/</code>, <code class="inline">src/services/</code></td><td>Sí</td></tr>
+      <tr><td>reservalugares (MySQL)</td><td>Base de datos propia</td><td>Persistencia de lugares/reservas; lógica de negocio en funciones y stored procedures</td><td><code class="inline">reserva-lugares-oficina-db/scripts/*.sql</code></td><td>Sí</td></tr>
+    </table>
+    <p style="font-size:13px;color:var(--texto-sec);">No se documentan tipos de componente sin evidencia real en este proyecto (worker/job, app móvil propia, librería interna compartida) — no se usan aquí.</p>
+    <div class="info-box">Nota: Microsoft Entra ID (Azure AD) es una dependencia externa crítica para el funcionamiento del sistema (sin ella, nadie puede autenticarse), pero <strong>no es un componente propio</strong> del proyecto. Ver sección 5.3 y 6.1.</div>
+  </div>
+
+  <div class="subsection">
+    <h3>2.3 Patrones, convenciones y decisiones de diseño</h3>
+    <table>
+      <tr><th>Nombre</th><th>Clasificación</th><th>Propósito</th><th>Evidencia</th><th>Confianza</th></tr>
+      <tr><td>Capas Router → Controller → Service → DB</td><td>Patrón de capa</td><td>Separar enrutamiento, orquestación y acceso a datos</td><td><code class="inline">src/routes</code>, <code class="inline">controllers</code>, <code class="inline">services</code></td><td>Alta</td></tr>
+      <tr><td>Middleware de autenticación centralizado</td><td>Convención de framework</td><td>Validar JWT una sola vez para todas las rutas /api/*</td><td><code class="inline">app.js</code>, <code class="inline">authMiddleware.js</code></td><td>Alta</td></tr>
+      <tr><td>Manejo de errores centralizado con excepción tipada</td><td>Patrón de diseño</td><td>Distinguir errores de negocio exponibles de errores internos</td><td><code class="inline">businessError.js</code>, <code class="inline">errorHandler.js</code></td><td>Alta</td></tr>
+      <tr><td>Acceso a datos solo vía stored procedures</td><td>Decisión arquitectónica / convención institucional</td><td>Centralizar lógica de negocio en la BD, evitar SQL directo</td><td><code class="inline">seatsService.js</code>, <code class="inline">reservationsService.js</code></td><td>Alta</td></tr>
+      <tr><td>Cancelación lógica (soft delete)</td><td>Patrón de diseño</td><td>Conservar histórico y permitir re-reservar el mismo lugar/fecha</td><td><code class="inline">web_de_cancel_reservation.sql</code></td><td>Alta</td></tr>
+      <tr><td>Instancia única (singleton) de MSAL</td><td>Patrón de diseño (Singleton)</td><td>Compartir una sola instancia entre main.jsx y httpClient.js</td><td><code class="inline">msalInstance.js</code></td><td>Alta</td></tr>
+      <tr><td>Interceptores HTTP en Axios</td><td>Patrón de diseño (Interceptor)</td><td>Inyectar token y centralizar manejo de 401/403</td><td><code class="inline">httpClient.js</code></td><td>Alta</td></tr>
+      <tr><td>Theming vía tokens de Ant Design</td><td>Convención de framework</td><td>Evitar colores/medidas hardcodeados</td><td><code class="inline">main.jsx</code>, <code class="inline">SeatMap.jsx</code></td><td>Alta</td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <h3>2.4 Diagramas Técnicos</h3>
+    <p><strong>A. Arquitectura de alto nivel</strong></p>
+    <pre>
+┌───────────────────────┐        Login / Logout (redirect)
+│ Empleado Verde Valle   │ ─────────────────────────────────────┐
+└───────────┬───────────┘                                       │
+            │ HTTPS                                              ▼
+            │                                        ┌───────────────────────────┐
+            ▼                                        │ Microsoft Entra ID (Azure  │
+┌───────────────────────┐   Bearer token (API scope)  │ AD) — 2 App Registrations: │
+│ Front (React + Vite)   │ ───────────────────────────▶│ Front (SPA) / API         │
+│ localhost:5173         │◀─────────────────────────── │ (API.Access)              │
+└───────────┬───────────┘   valida firma/aud/iss       └───────────────────────────┘
+            │ HTTPS + JSON {success,data}/{success,error}          ▲
+            ▼                                                       │ valida token
+┌───────────────────────┐                                           │
+│ API (Node.js/Express)  │───────────────────────────────────────────┘
+│ localhost:4000          │
+└───────────┬───────────┘
+            │ CALL sp(...)  (mysql2/promise, nunca SQL directo sobre tablas)
+            ▼
+┌───────────────────────┐
+│ MySQL — reservalugares │
+│ dbo_seats / dbo_reservations + funciones/SPs
+└───────────────────────┘
+    </pre>
+    <p><strong>B. Flujo funcional principal</strong></p>
+    <pre>
+Empleado inicia sesión (Azure AD)
+   → Front consulta "mis reservas" (GET /api/reservations/me)
+      → ¿Tiene reserva activa?
+          Sí → tarjeta (lugar, fecha) con opciones: Ver / Editar / Cancelar
+          No → botón "Apartar lugar"
+   → Empleado elige fecha
+      → Front consulta disponibilidad (GET /api/seats?date=)
+      → Empleado selecciona un lugar disponible
+      → Front confirma (POST /api/reservations  ó  PUT /api/reservations/:id)
+   → API valida (Azure AD + reglas de negocio en stored procedures)
+   → MySQL valida disponibilidad/fecha/pertenencia, inserta o actualiza
+   → API responde {success:true, data:{...}}
+   → Front regresa a "Mis reservas" actualizado
+    </pre>
+    <p><strong>C. Secuencia — creación de reserva</strong></p>
+    <pre>
+Front                     API (Express)                MySQL
+ │  POST /api/reservations │                              │
+ │  + Bearer token          │                              │
+ ├─────────────────────────▶│                              │
+ │                          │ authMiddleware: valida JWT   │
+ │                          │ reservationValidators: valida │
+ │                          │ seatId/date                   │
+ │                          │ CALL web_in_create_reservation│
+ │                          ├───────────────────────────────▶│
+ │                          │                              │ valida fecha/disponibilidad
+ │                          │                              │ INSERT + COMMIT (o SIGNAL)
+ │                          │◀───────────────────────────────┤
+ │◀─────────────────────────┤ {success:true, data:{...}}    │
+    </pre>
+    <div class="info-box">El detalle interno de componentes React (providers, hooks, layouts, componentes visuales) no se incluye aquí — está documentado en <code class="inline">knowledge/FRONTEND.md</code>.</div>
+  </div>
+</div>
+
+<!-- ===================== 3. REQUISITOS ===================== -->
+<div class="section" id="s3">
+  <h2>3. Requisitos</h2>
+
+  <div class="subsection">
+    <h3>3.1 Requisitos Funcionales</h3>
+    <table>
+      <tr><th>ID</th><th>Descripción</th><th>Prioridad</th><th>Fuente</th></tr>
+      <tr><td>RF-01</td><td>El sistema debe permitir a un usuario iniciar sesión con su cuenta corporativa de Verde Valle vía Azure AD.</td><td>Alta</td><td>Código + Contexto usuario</td></tr>
+      <tr><td>RF-02</td><td>El sistema debe permitir consultar la disponibilidad de los 20 lugares de oficina para una fecha específica.</td><td>Alta</td><td>Código + Contexto usuario</td></tr>
+      <tr><td>RF-03</td><td>El sistema debe permitir crear una reserva de un lugar disponible para una fecha determinada.</td><td>Alta</td><td>Código + Contexto usuario</td></tr>
+      <tr><td>RF-04</td><td>El sistema debe permitir editar (reprogramar) una reserva propia existente.</td><td>Alta</td><td>Código + Contexto usuario</td></tr>
+      <tr><td>RF-05</td><td>El sistema debe permitir cancelar una reserva propia mediante cancelación lógica, sin eliminar el registro físicamente.</td><td>Alta</td><td>Código + Contexto usuario</td></tr>
+      <tr><td>RF-06</td><td>El sistema debe permitir consultar las reservas activas y futuras del usuario autenticado.</td><td>Alta</td><td>Código + Contexto usuario</td></tr>
+      <tr><td>RF-07</td><td>El sistema no debe permitir crear reservas con fecha anterior al día actual.</td><td>Alta</td><td>Código</td></tr>
+      <tr><td>RF-08</td><td>El sistema debe impedir editar o cancelar una reserva que no pertenezca al usuario autenticado.</td><td>Alta</td><td>Código</td></tr>
+      <tr><td>RF-09</td><td>El sistema debe identificar al usuario únicamente a partir del token de Azure AD, nunca de parámetros enviados por el cliente.</td><td>Alta</td><td>Código</td></tr>
+      <tr><td>RF-10</td><td>El sistema permite a un usuario tener más de una reserva activa simultánea, en fechas distintas (no restringe a una sola reserva por usuario).</td><td>Baja</td><td>Contexto usuario (confirmado 2026-09-10) + Código</td></tr>
+    </table>
+    <div class="resolved-note">
+      <strong>Resuelto — comportamiento confirmado</strong>
+      <p>El desarrollador aclaró que el sistema <strong>no</strong> limita al usuario a una sola reserva activa: puede tener más de una reserva en fechas distintas. Esa restricción de "una sola reserva" simplemente no está implementada en esta versión — es el comportamiento actual confirmado, no una ambigüedad ni un bug. La interfaz ("Mis reservas") solo muestra la primera reserva devuelta por el backend, lo cual queda documentado como una limitación conocida de la UI (ver <code class="inline">knowledge/FRONTEND.md</code>), no como una regla de negocio.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/INFORMATION_GAPS.md</code> (GAP-10, Resuelto), <code class="inline">knowledge/BUSINESS_RULES.md</code> (BR-17).</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>3.2 Requisitos No Funcionales</h3>
+    <table>
+      <tr><th>Atributo</th><th>Descripción / Métrica</th><th>Fuente</th></tr>
+      <tr><td>Seguridad</td><td>Autenticación vía Azure AD/JWT (RS256), CORS con lista blanca, Helmet, consultas parametrizadas. Ver sección 6 para hallazgos pendientes.</td><td>Código</td></tr>
+      <tr><td>Mantenibilidad</td><td>Separación en capas (routes/controllers/services/middlewares) siguiendo el estándar interno de Verde Valle; ausencia total de pruebas automatizadas reduce la mantenibilidad real. Ver sección 8.</td><td>Código</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== 4. BASE DE DATOS ===================== -->
+<div class="section" id="s4">
+  <h2>4. Base de Datos</h2>
+  <p>Sí existe base de datos propia: <strong>MySQL</strong> (versión 9.7 según README), base <code class="inline">reservalugares</code>, <code class="inline">utf8mb4</code>, tablas InnoDB. Todo acceso desde el backend es vía funciones/stored procedures. <span class="legend-tag tag-validado">Validado por código</span> Resumen a continuación; detalle completo en <code class="inline">knowledge/DATABASE.md</code>.</p>
+
+  <div class="subsection">
+    <h3>4.1 Modelo de Datos</h3>
+    <pre>
+dbo_seats (1) ──────< (N) dbo_reservations
+   id  PK                    id            PK
+   code UNIQUE                id_seat       FK -> dbo_seats.id
+   seat_row                   reservation_date
+   seat_column                user_email
+   is_active/is_deleted/...   is_active/is_deleted/deleted_at/...
+    </pre>
+    <p>No existe tabla de usuarios propia: el usuario se identifica solo por <code class="inline">user_email</code> (proveniente del token de Azure AD).</p>
+  </div>
+
+  <div class="subsection">
+    <h3>4.2 Tablas / Colecciones Clave</h3>
+    <table>
+      <tr><th>Entidad</th><th>Descripción</th><th>Columnas relevantes</th><th>Fuente</th></tr>
+      <tr><td>dbo_seats</td><td>Los 20 lugares físicos fijos de la oficina</td><td>id (PK), code (UNIQUE), seat_row, seat_column, is_active, is_deleted, created_at, updated_at, deleted_at</td><td>Código</td></tr>
+      <tr><td>dbo_reservations</td><td>Reservas hechas por los usuarios</td><td>id (PK), id_seat (FK), reservation_date, user_email, is_active, is_deleted, created_at, updated_at, deleted_at</td><td>Código</td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <h3>4.3 Reglas de Integridad</h3>
+    <ul>
+      <li>PK autoincremental en ambas tablas; FK <code class="inline">dbo_reservations.id_seat → dbo_seats.id</code>.</li>
+      <li><code class="inline">dbo_seats.code</code> es UNIQUE. No existe <code class="inline">UNIQUE(id_seat, reservation_date)</code> — decisión explícita para permitir re-reservar tras cancelación lógica.</li>
+      <li>Índices: <code class="inline">idx_dbo_reservations_id_seat_reservation_date</code>, <code class="inline">idx_dbo_reservations_user_email</code>.</li>
+      <li>Validaciones de negocio en SPs: parámetros no nulos, fecha no pasada, disponibilidad del lugar, pertenencia de la reserva al usuario (vía <code class="inline">SIGNAL SQLSTATE '45000'</code>).</li>
+    </ul>
+    <div class="resolved-note">
+      <strong>Resuelto — diseño confirmado, no era una contradicción</strong>
+      <p>El script versionado <code class="inline">01_create_database.sql</code> otorga <code class="inline">SELECT, INSERT, UPDATE, EXECUTE</code> directo al usuario de aplicación, a diferencia del README de la base de datos, que documenta un usuario con solo permiso <code class="inline">EXECUTE</code> vía rol dedicado. El desarrollador aclaró que estos permisos amplios fueron <strong>intencionales</strong>, para crear el usuario de aplicación dentro de la base de datos durante el despliegue; ya se ejecutó así en el entorno real.</p>
+      <p>Nota menor (fuera del alcance de este agente): el README de la base de datos podría actualizarse para reflejar esta realidad, pero no bloquea la operación del sistema.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/DATABASE.md</code>, <code class="inline">knowledge/DECISIONS.md</code> (D7), <code class="inline">knowledge/INFORMATION_GAPS.md</code> (GAP-05, Resuelto).</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>4.4 Backup y Mantenimiento</h3>
+    <table>
+      <tr><th>Aspecto</th><th>Detalle</th></tr>
+      <tr><td>Frecuencia de backup</td><td>N/A para esta versión del proyecto</td></tr>
+      <tr><td>Herramienta / destino</td><td>N/A para esta versión del proyecto</td></tr>
+      <tr><td>Retención</td><td>N/A para esta versión del proyecto</td></tr>
+      <tr><td>Procedimiento de restauración</td><td>N/A para esta versión del proyecto</td></tr>
+    </table>
+    <div class="resolved-note">
+      <strong>N/A — confirmado por el desarrollador</strong>
+      <p>No existe backup ni mantenimiento de la base de datos por el momento. El desarrollador confirmó explícitamente que esto no aplica para el alcance actual del proyecto (capacitación, sin datos reales de producción). Si el sistema llegara a manejar datos reales en el futuro, esta sección debería revisarse.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/DATABASE.md</code>, <code class="inline">knowledge/INFORMATION_GAPS.md</code> (GAP-07, N/A).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 5. APIs E INTERFACES ===================== -->
+<div class="section" id="s5">
+  <h2>5. APIs e Interfaces</h2>
+
+  <div class="subsection">
+    <h3>5.1 Endpoints</h3>
+    <p>Catálogo completo con request/response detallado en <code class="inline">knowledge/API.md</code>. Resumen:</p>
+    <table>
+      <tr><th>Método</th><th>Ruta</th><th>Descripción</th><th>Auth</th><th>Fuente</th></tr>
+      <tr><td>GET</td><td>/health</td><td>Estado básico del servicio</td><td>Ninguna</td><td>Código</td></tr>
+      <tr><td>GET</td><td>/health/secure</td><td>Estado básico + usuario autenticado</td><td>JWT</td><td>Código</td></tr>
+      <tr><td>GET</td><td>/api/seats?date=YYYY-MM-DD</td><td>Grid de 20 lugares con estado para la fecha</td><td>JWT</td><td>Código</td></tr>
+      <tr><td>GET</td><td>/api/reservations/me</td><td>Reservas activas y futuras del usuario autenticado</td><td>JWT</td><td>Código</td></tr>
+      <tr><td>POST</td><td>/api/reservations</td><td>Crea una reserva — body <code class="inline">{seatId, date}</code></td><td>JWT</td><td>Código</td></tr>
+      <tr><td>PUT</td><td>/api/reservations/:id</td><td>Reprograma una reserva propia — body <code class="inline">{seatId, date}</code></td><td>JWT</td><td>Código</td></tr>
+      <tr><td>DELETE</td><td>/api/reservations/:id</td><td>Cancela (lógicamente) una reserva propia</td><td>JWT</td><td>Código</td></tr>
+    </table>
+    <div class="info-box">Formato uniforme de respuesta en toda la API: éxito <code class="inline">{success:true,data:{...}}</code>, error <code class="inline">{success:false,error:{code,message}}</code>. No se encontró documentación Swagger/OpenAPI. El desarrollador confirmó (2026-09-10) que decidió <strong>no implementarla por ahora</strong>; queda anotada como mejora futura a evaluar si el proyecto crece, no como pendiente crítico (ver Anexo A, GAP-15).</div>
+  </div>
+
+  <div class="subsection">
+    <h3>5.2 Interfaz de Usuario (UI)</h3>
+    <table>
+      <tr><th>Pantalla</th><th>Propósito</th><th>Funcionalidad</th><th>Servicios consumidos</th><th>Archivos</th></tr>
+      <tr>
+        <td>Pantalla de Login</td>
+        <td>Permitir iniciar sesión con Azure AD</td>
+        <td>Botón "Iniciar sesión" → <code class="inline">loginRedirect</code></td>
+        <td>MSAL (sin llamadas al API propio)</td>
+        <td><code class="inline">App.jsx</code> (componente interno)</td>
+      </tr>
+      <tr>
+        <td>Inicio ("Mis reservas")</td>
+        <td>Ver, editar o cancelar la reserva activa del usuario</td>
+        <td>Muestra tarjeta con lugar/fecha o estado vacío; abre modal con mapa de solo lectura; navega a edición; cancela con confirmación</td>
+        <td><code class="inline">GET /api/reservations/me</code>, <code class="inline">GET /api/seats</code>, <code class="inline">DELETE /api/reservations/:id</code></td>
+        <td><code class="inline">src/pages/Inicio.jsx</code></td>
+      </tr>
+      <tr>
+        <td>Reservar Lugar (crear/editar)</td>
+        <td>Elegir fecha y lugar disponible para crear o modificar una reserva</td>
+        <td>DatePicker (sin fechas pasadas), mapa de selección, confirmar/guardar</td>
+        <td><code class="inline">GET /api/seats</code>, <code class="inline">POST /api/reservations</code>, <code class="inline">PUT /api/reservations/:id</code></td>
+        <td><code class="inline">src/pages/ReservarLugar.jsx</code></td>
+      </tr>
+    </table>
+    <div class="info-box">Detalle interno adicional (componentes reutilizables, hooks, providers, layouts) documentado en <code class="inline">knowledge/FRONTEND.md</code>, no repetido aquí conforme a las reglas de este documento.</div>
+  </div>
+
+  <div class="subsection">
+    <h3>5.3 Integraciones Externas</h3>
+    <table>
+      <tr><th>Servicio externo</th><th>Propósito</th><th>Protocolo / SDK</th><th>Auth</th><th>Fuente</th></tr>
+      <tr><td>Microsoft Entra ID (Azure AD)</td><td>Login SSO corporativo y validación de tokens de acceso</td><td>OAuth2/OIDC — <code class="inline">@azure/msal-browser</code>/<code class="inline">msal-react</code> (front), <code class="inline">jsonwebtoken</code>+<code class="inline">jwks-rsa</code> (backend)</td><td>2 App Registrations (front SPA + API scope <code class="inline">API.Access</code>)</td><td>Código</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== 6. SEGURIDAD ===================== -->
+<div class="section" id="s6">
+  <h2>6. Seguridad</h2>
+
+  <div class="subsection">
+    <h3>6.1 Autenticación y Autorización</h3>
+    <p><strong>Mecanismo:</strong> OAuth2/OIDC vía Microsoft Entra ID (Azure AD) — MSAL en frontend, verificación manual de JWT (RS256) con <code class="inline">jsonwebtoken</code> + <code class="inline">jwks-rsa</code> en backend. <span class="legend-tag tag-validado">Validado por código</span></p>
+    <p><strong>Autorización:</strong> no hay autorización granular por rol — cualquier token válido del tenant configurado tiene acceso a todas las operaciones. La única verificación de "propiedad" es a nivel de dato: los SPs de editar/cancelar validan que <code class="inline">user_email</code> coincida con el del token.</p>
+    <div class="resolved-note">
+      <strong>N/A — decisión de alcance confirmada</strong>
+      <p>No se encontraron roles ni permisos granulares (ej. administrador de espacios vs. empleado); todo usuario autenticado tiene el mismo nivel de acceso funcional. El desarrollador confirmó que no es necesario especificar roles/permisos granulares por tratarse de una actividad de práctica — es una decisión de alcance del proyecto, no un pendiente de negocio sin resolver.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/SECURITY.md</code>, <code class="inline">knowledge/INFORMATION_GAPS.md</code> (GAP-09, N/A).</p>
+    </div>
+    <div class="resolved-note">
+      <strong>Resuelto — corregido en código</strong>
+      <p><code class="inline">authMiddleware.js</code> contenía un <code class="inline">console.log('DEBUG jwt.verify error ->', ...)</code> no condicionado por <code class="inline">NODE_ENV</code>. El equipo ya corrigió el código: se reemplazó por <code class="inline">logger.debug('JWT verification failed', { errorName: err.name, errorMessage: err.message })</code>, usando el logger de <code class="inline">winston</code> ya existente en <code class="inline">src/config/logger.js</code> (mismo patrón que <code class="inline">errorHandler.js</code>). El nivel del logger es <code class="inline">'debug'</code> en desarrollo e <code class="inline">'info'</code> en calidad/producción, por lo que en QAS/Producción ese log ya no se emite. Se confirmó el cambio por lectura directa del archivo real; este agente no modificó código fuente.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/SECURITY.md</code>, <code class="inline">knowledge/RISKS.md</code> (R5, Mitigado), <code class="inline">knowledge/INFORMATION_GAPS.md</code> (GAP-11, Resuelto).</p>
+    </div>
+    <div class="resolved-note">
+      <strong>Resuelto — límite de tasa de peticiones agregado</strong>
+      <p>No se encontraba <code class="inline">express-rate-limit</code> configurado en el backend. El equipo ya lo agregó: <code class="inline">reserva-lugares-oficina-api/src/app.js</code> monta un <code class="inline">apiLimiter</code> (<code class="inline">express-rate-limit</code>, dependencia <code class="inline">^8.7.0</code> en <code class="inline">package.json</code>) sobre <code class="inline">/api</code> — <code class="inline">windowMs: 15 * 60 * 1000</code>, <code class="inline">max: 300</code> solicitudes por IP — montado <strong>antes</strong> del <code class="inline">authMiddleware</code>. Confirmado por lectura directa de <code class="inline">app.js</code> y <code class="inline">package.json</code>; este agente no modificó código fuente.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/SECURITY.md</code>, <code class="inline">knowledge/RISKS.md</code> (R8, Mitigado), <code class="inline">knowledge/DEPENDENCIES.md</code>.</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>6.2 Cifrado y Datos Sensibles</h3>
+    <ul>
+      <li><strong>Datos en tránsito:</strong> depende del despliegue real (HTTPS confirmado en las URLs de QAS; en local todo es HTTP). No se encontró configuración de servidor/TLS en el repositorio.</li>
+      <li><strong>Datos en reposo:</strong> No encontrado.</li>
+      <li><strong>Secrets/variables de entorno:</strong> <code class="inline">.env</code>/<code class="inline">.env.qas</code>/<code class="inline">.env.prd</code> correctamente excluidos de git (confirmado con <code class="inline">git ls-files</code>) en ambos proyectos.</li>
+      <li><strong>Certificados:</strong> No encontrado.</li>
+    </ul>
+    <div class="resolved-note">
+      <strong>Resuelto — contraseña rotada</strong>
+      <p>El script <strong>versionado en git</strong> <code class="inline">reserva-lugares-oficina-db/scripts/01_create_database.sql</code> contenía una contraseña de base de datos en texto plano, coincidente con la usada en <code class="inline">.env.qas</code> local. El desarrollador confirmó que la contraseña ya fue <strong>rotada/cambiada</strong> por el equipo; el valor anterior permanece en el historial de git, pero ya no es una credencial válida. Se mantiene como recomendación general no volver a hardcodear secretos en scripts versionados en git.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/SECURITY.md</code>, <code class="inline">knowledge/RISKS.md</code> (R1), <code class="inline">knowledge/INFORMATION_GAPS.md</code> (GAP-04, Resuelto).</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>6.3 Cumplimiento Normativo</h3>
+    <div class="resolved-note">
+      <strong>N/A — confirmado por el desarrollador</strong>
+      <p>No se encontró evidencia de cumplimiento formal con LFPDPPP, ISO 27001, GDPR ni políticas internas de protección de datos personales, pese a que el sistema maneja el correo corporativo del empleado como identificador. El desarrollador confirmó que no hay ningún marco de cumplimiento formal aplicable por el momento; queda registrado como N/A explícito, no como pendiente de investigar.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/SECURITY.md</code>.</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>6.4 Gestión de Vulnerabilidades</h3>
+    <div class="resolved-note">
+      <strong>N/A — decisión de alcance confirmada</strong>
+      <p>No se encontró SAST, DAST, Dependabot, evidencia de ejecución de <code class="inline">npm audit</code>, ni proceso formal de aplicación de parches de dependencias. El desarrollador confirmó que, por ser una actividad de capacitación, no se van a agregar herramientas de este tipo por ahora.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/SECURITY.md</code>, <code class="inline">knowledge/INFORMATION_GAPS.md</code> (GAP-12, N/A).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 7. CONFIGURACIÓN Y DESPLIEGUE ===================== -->
+<div class="section" id="s7">
+  <h2>7. Configuración y Despliegue</h2>
+
+  <div class="subsection">
+    <h3>7.1 Entornos</h3>
+    <table>
+      <tr><th>Entorno</th><th>URL / Host</th><th>Variables de entorno relevantes</th><th>Fuente</th></tr>
+      <tr><td>Desarrollo</td><td>Front: localhost:5173 · API: localhost:4000</td><td><code class="inline">.env</code> (no versionado)</td><td>Código</td></tr>
+      <tr><td>Pruebas / QAS</td><td>https://practicadespliegue.verdevalle.com.mx (front y /api), servidos a través de <strong>Nginx</strong></td><td><code class="inline">.env.qas</code> (no versionado, presente localmente)</td><td>Código + Contexto usuario (Nginx confirmado por el desarrollador)</td></tr>
+      <tr><td>Producción</td><td>N/A — no existe ni está planeado por el momento</td><td>N/A (no existe <code class="inline">.env.prd</code> en el repositorio)</td><td>Contexto usuario (confirmado 2026-09-10)</td></tr>
+    </table>
+    <div class="resolved-note">
+      <strong>N/A — confirmado por el desarrollador</strong>
+      <p>El desarrollador confirmó explícitamente que, por ahora, el proyecto es únicamente una actividad de capacitación/QAS: <strong>no existe ni está planeado</strong> un ambiente de Producción real por el momento. Esto deja de ser un hueco de información pendiente de investigar y pasa a ser una confirmación de alcance del proyecto.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/DEPLOYMENT.md</code>, <code class="inline">knowledge/INFORMATION_GAPS.md</code> (GAP-13, N/A).</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>7.2 Procedimiento de Despliegue</h3>
+    <div class="resolved-note">
+      <strong>Resuelto — despliegue manual vía Nginx</strong>
+      <p>Confirmado por el desarrollador: el despliegue a QAS se realiza por medio de <strong>Nginx</strong>, que sirve el build estático del frontend y proxya las peticiones <code class="inline">/api</code> hacia el backend Node/Express. El proceso es manual: se genera el build del frontend (<code class="inline">npm run build:qas</code>), se publica en el servidor donde corre Nginx, y el backend se ejecuta directamente con Node (<code class="inline">npm start</code>) detrás del proxy. El repositorio no versiona el archivo de configuración de Nginx.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/DEPLOYMENT.md</code>, <code class="inline">knowledge/INFORMATION_GAPS.md</code> (GAP-03, Resuelto).</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>7.3 CI/CD</h3>
+    <div class="resolved-note">
+      <strong>Resuelto — decisión de alcance confirmada: despliegue manual, sin CI/CD ni Docker</strong>
+      <p>No existe carpeta <code class="inline">.github/workflows/</code>, ni configuración de Azure DevOps, GitLab CI o Jenkins en el repositorio; tampoco se encontró <code class="inline">Dockerfile</code> ni <code class="inline">docker-compose.yml</code>. El desarrollador confirmó que el despliegue es manual (vía Nginx, ver 7.2) y que <strong>no hay CI/CD ni Docker planeado por ahora</strong>. Es un hecho confirmado de alcance del proyecto (capacitación), no un hueco de documentación pendiente.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/DEPLOYMENT.md</code>, <code class="inline">knowledge/INFORMATION_GAPS.md</code> (GAP-01, GAP-06, Resueltos).</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>7.4 Monitoreo y Observabilidad</h3>
+    <div class="resolved-note">
+      <strong>N/A — confirmado por el desarrollador para esta etapa del proyecto</strong>
+      <p>El proyecto no avanza por ahora más allá de una actividad de capacitación, por lo que métricas, alertas y gestión de incidencias formales no aplican en esta etapa. Como referencia técnica (no como monitoreo formal), el backend sí cuenta con logging básico de aplicación: Morgan (requests) canalizado a Winston, con archivo local solo fuera de <code class="inline">development</code> y, desde el 2026-09-10, con rotación diaria configurada (ver nota siguiente).</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/DEPLOYMENT.md</code>, <code class="inline">knowledge/INFORMATION_GAPS.md</code> (GAP-08, N/A).</p>
+    </div>
+    <div class="resolved-note">
+      <strong>Resuelto — rotación de logs agregada</strong>
+      <p>Los logs de <code class="inline">winston</code> a archivo no tenían rotación ni límite de tamaño configurado. El equipo ya lo corrigió: <code class="inline">reserva-lugares-oficina-api/src/config/logger.js</code> ahora usa <code class="inline">winston-daily-rotate-file</code> (dependencia <code class="inline">^5.0.0</code> en <code class="inline">package.json</code>) mediante <code class="inline">DailyRotateFile</code> para <code class="inline">logs/error-%DATE%.log</code> y <code class="inline">logs/combined-%DATE%.log</code>, con <code class="inline">datePattern: 'YYYY-MM-DD'</code>, <code class="inline">maxSize: '20m'</code> y <code class="inline">maxFiles: '14d'</code>. Confirmado por lectura directa de <code class="inline">logger.js</code> y <code class="inline">package.json</code>; este agente no modificó código fuente.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/DEPLOYMENT.md</code>, <code class="inline">knowledge/RISKS.md</code> (R9, Mitigado), <code class="inline">knowledge/DEPENDENCIES.md</code>.</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>7.5 Gestión de Versiones</h3>
+    <p>Git, repositorio único en GitHub (<code class="inline">PracticanteDesarrolloVV/reserva-lugares-oficina</code>). Flujo documentado: rama individual derivada de <code class="inline">calidad</code>, merge vía Pull Request con aprobación de otro integrante (nadie aprueba su propio PR). Ramas reales encontradas: <code class="inline">main</code>, <code class="inline">calidad</code>, <code class="inline">practicante-desarrollo</code> (activa). Commits en formato <code class="inline">tipo(módulo): descripción</code>, confirmado en el historial real. No se encontraron tags de versión en el repositorio. <span class="legend-tag tag-validado">Validado por código</span></p>
+    <div class="resolved-note">
+      <strong>Resuelto (2026-09-10) — versión del frontend actualizada</strong>
+      <p>El <code class="inline">package.json</code> del frontend mantenía la versión por defecto de Vite (<code class="inline">0.0.0</code>); el desarrollador la actualizó a <code class="inline">"version": "1.0.0"</code>, igualándola a la que ya tenía la API. No existe todavía una política formal de incremento de versión (SemVer real) más allá de este valor fijo, ni tags de release; se mantiene como mejora futura no bloqueante.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/RISKS.md</code> (R15, Resuelto), <code class="inline">knowledge/DEPLOYMENT.md</code>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 8. PRUEBAS ===================== -->
+<div class="section" id="s8">
+  <h2>8. Pruebas</h2>
+
+  <div class="subsection">
+    <h3>8.1 Estrategia de Pruebas</h3>
+    <table>
+      <tr><th>Tipo</th><th>Alcance</th><th>Herramienta</th><th>Cobertura mínima</th><th>Fuente</th></tr>
+      <tr><td>Unitarias</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+      <tr><td>Integración</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+      <tr><td>E2E / Sistema</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+      <tr><td>Rendimiento</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+    </table>
+    <div class="resolved-note">
+      <strong>N/A — decisión de alcance confirmada</strong>
+      <p>No se encontró ninguna dependencia de testing (Jest, Vitest, Mocha, Supertest, Testing Library, Cypress, Playwright) en ninguno de los dos <code class="inline">package.json</code>, ni carpetas <code class="inline">tests/</code>/<code class="inline">__tests__/</code> propias del proyecto. El desarrollador confirmó que no se realizaron pruebas automatizadas por tratarse de una aplicación de capacitación — esto se marca como N/A para el alcance actual, no como un pendiente por implementar.</p>
+      <p><strong>Archivo knowledge relacionado:</strong> <code class="inline">knowledge/DEPENDENCIES.md</code>, <code class="inline">knowledge/RISKS.md</code> (R3), <code class="inline">knowledge/INFORMATION_GAPS.md</code> (GAP-02, N/A).</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>8.2 Criterios de Aceptación</h3>
+    <div class="resolved-note">
+      <strong>N/A — confirmado por el desarrollador</strong>
+      <p>El desarrollador confirmó (2026-09-10) que <strong>no hay criterios de aceptación formales definidos por ahora</strong> para los flujos del sistema. No se encontró tampoco documento de requisitos ni historias de usuario con criterios de aceptación en el repositorio. Esta sección queda marcada como N/A explícito para el alcance actual del proyecto (capacitación), no como un pendiente abierto de investigación.</p>
+      <p><strong>Sugerencia (no bloqueante):</strong> si el proyecto avanza más allá de capacitación, definir criterios de aceptación explícitos para los flujos de crear/editar/cancelar reserva, para soportar pruebas futuras.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 9. RIESGOS ===================== -->
+<div class="section" id="s9">
+  <h2>9. Riesgos</h2>
+  <p>Detalle completo (incluye deuda técnica y mejoras sugeridas) en <code class="inline">knowledge/RISKS.md</code>. Actualización 2026-09-10 (cuarta pasada — cierre de ciclo): se cerraron los 2 últimos riesgos que permanecían en estado "Pendiente" (R11, R15) y se registró un nuevo hallazgo (R16). Se conserva cada riesgo identificado en el análisis original, sin eliminar ninguno.</p>
+  <table>
+    <tr><th>Riesgo</th><th>Probabilidad</th><th>Impacto</th><th>Mitigación</th><th>Fuente</th><th>Estado</th></tr>
+    <tr><td>Contraseña de BD hardcodeada en script SQL versionado en git</td><td>Alta (histórico)</td><td class="impact-low">Bajo (mitigado)</td><td>Rotar contraseña; no repetir el patrón en futuros scripts</td><td>Código</td><td class="estado-resuelto">Mitigado</td></tr>
+    <tr><td>Permisos otorgados al usuario de BD distintos al README (SELECT/INSERT/UPDATE/EXECUTE vs. solo EXECUTE)</td><td>Alta (ya aplicado)</td><td class="impact-medium">Medio</td><td>Actualizar el README de la BD para reflejar el diseño real (opcional, no bloqueante)</td><td>Código</td><td class="estado-resuelto">Resuelto — diseño confirmado</td></tr>
+    <tr><td>Ausencia total de pruebas automatizadas</td><td>Alta (confirmado)</td><td class="impact-low">Bajo (para el alcance actual)</td><td>Ninguna acción requerida por ahora; reevaluar si el proyecto crece</td><td>Código</td><td class="estado-na">N/A — decisión de alcance</td></tr>
+    <tr><td>Sin CI/CD, Docker ni procedimiento formal de despliegue</td><td>Alta</td><td class="impact-low">Bajo (para el alcance actual)</td><td>Ninguna acción requerida por ahora; reevaluar si el proyecto pasa a producción real</td><td>Código</td><td class="estado-resuelto">Resuelto — manual vía Nginx, confirmado</td></tr>
+    <tr><td><code class="inline">console.log</code> de depuración en authMiddleware sin condicionar por ambiente</td><td>Media (histórico)</td><td class="impact-low">Bajo (mitigado)</td><td>Ya corregido: reemplazado por <code class="inline">logger.debug(...)</code> condicionado por nivel de ambiente</td><td>Código</td><td class="estado-resuelto">Mitigado — confirmado por lectura del código</td></tr>
+    <tr><td>Sin constraint de "una reserva activa por usuario"</td><td>Media</td><td class="impact-low">Bajo (comportamiento válido)</td><td>Ninguna acción requerida; el sistema sí permite varias reservas por diseño confirmado</td><td>Código</td><td class="estado-resuelto">Resuelto — comportamiento confirmado</td></tr>
+    <tr><td>Sin roles/permisos granulares</td><td>Media</td><td class="impact-medium">Medio (para crecimiento futuro)</td><td>Evaluar necesidad de roles a futuro</td><td>Código</td><td class="estado-na">N/A — decisión de alcance</td></tr>
+    <tr><td>Sin rate limiting en el backend</td><td>Media (histórico)</td><td class="impact-low">Bajo (mitigado)</td><td>Ya corregido: se agregó <code class="inline">express-rate-limit</code> (<code class="inline">apiLimiter</code>, 300 solicitudes/15 min por IP) en <code class="inline">app.js</code>, antes del <code class="inline">authMiddleware</code></td><td>Código</td><td class="estado-resuelto">Mitigado — confirmado por lectura del código</td></tr>
+    <tr><td>Logs sin rotación configurada</td><td>Media (histórico)</td><td class="impact-low">Bajo (mitigado)</td><td>Ya corregido: <code class="inline">logger.js</code> usa <code class="inline">winston-daily-rotate-file</code> (<code class="inline">maxSize: '20m'</code>, <code class="inline">maxFiles: '14d'</code>)</td><td>Código</td><td class="estado-resuelto">Mitigado — confirmado por lectura del código</td></tr>
+    <tr><td>Sin gestión de vulnerabilidades de dependencias</td><td>Media</td><td class="impact-medium">Medio (para producción real)</td><td>Habilitar Dependabot / npm audit si el proyecto avanza</td><td>Código</td><td class="estado-na">N/A — decisión de alcance</td></tr>
+    <tr><td>Varias dependencias en versiones mayores muy recientes (React 19, Express 5, Vite 8, Ant Design 6, ESLint 10, react-router-dom 7) — desfase de parches/minor dentro de esas mayores</td><td>Baja-Media (histórico)</td><td class="impact-low">Medio (mitigado)</td><td>Ya aplicado: se corrió <code class="inline">npm outdated</code>/<code class="inline">npm update</code> en front y api, sin saltar de versión mayor (front → react/react-dom <code class="inline">19.3.0</code>, react-router-dom <code class="inline">7.18.3</code>, antd <code class="inline">6.6.3</code>, vite <code class="inline">8.3.0</code>, eslint <code class="inline">10.10.0</code>; api → mysql2 <code class="inline">3.24.4</code>); API responde (<code class="inline">/health</code> 200) y front compila (<code class="inline">npm run build</code>)</td><td>Código (<code class="inline">knowledge/DEPENDENCIES.md</code>)</td><td class="estado-resuelto">Mitigado — no Resuelto al 100% (el riesgo de fondo de estar en mayores recientes se mantiene, es decisión de alcance)</td></tr>
+    <tr><td>Sin estrategia de backup de MySQL documentada</td><td>No determinada</td><td class="impact-low">Baja</td><td>Documentar backup si el proyecto llega a manejar datos reales</td><td>Código</td><td class="estado-na">N/A — decisión de alcance</td></tr>
+    <tr><td>Sin monitoreo/observabilidad más allá de logs locales</td><td>No determinada</td><td class="impact-low">Baja</td><td>Evaluar herramienta de APM si escala a producción</td><td>Código</td><td class="estado-na">N/A — decisión de alcance</td></tr>
+    <tr><td>Archivo vacío "practicante-desarrollo" versionado por error</td><td>Baja (histórico)</td><td class="impact-low">Baja</td><td>Ya eliminado del repositorio</td><td>Código</td><td class="estado-resuelto">Mitigado — verificado que ya no existe</td></tr>
+    <tr><td><code class="inline">package.json</code> del frontend con versión por defecto de Vite (<code class="inline">0.0.0</code>), sin política de SemVer visible</td><td>Baja (histórico)</td><td class="impact-low">Baja</td><td>Ya aplicado: se actualizó a <code class="inline">"version": "1.0.0"</code>, igual que la API</td><td>Código</td><td class="estado-resuelto">Resuelto — confirmado por lectura del código</td></tr>
+    <tr><td><strong>(Nuevo, R16)</strong> Error real de ESLint (<code class="inline">react-hooks/set-state-in-effect</code>) en <code class="inline">src/pages/Inicio.jsx</code>: <code class="inline">cargarReservas</code> se llamaba directamente dentro de un <code class="inline">useEffect</code>, riesgo de renders en cascada. Preexistente, no causado por la actualización de dependencias de hoy.</td><td>Media (histórico, ya corregido)</td><td class="impact-low">Bajo-Medio (mitigado)</td><td>Ya aplicado: se movió la lógica async a una IIFE dentro del <code class="inline">useEffect</code>, con bandera <code class="inline">ignorar</code></td><td>Código (<code class="inline">Inicio.jsx</code>), hallazgo nuevo del 2026-09-10</td><td class="estado-resuelto">Resuelto — confirmado por lectura del código y <code class="inline">npm run lint</code> sin errores</td></tr>
+  </table>
+  <div class="resolved-note">
+    <strong>Cierre total de riesgos técnicos (2026-09-10, cuarta pasada)</strong>
+    <p>Con el cierre de R11 (Mitigado) y R15 (Resuelto), y el registro y cierre inmediato del nuevo hallazgo R16 (Resuelto), <strong>no queda ningún riesgo en <code class="inline">knowledge/RISKS.md</code> en estado "Pendiente"</strong>. Todos los riesgos identificados a lo largo del ciclo de documentación quedan en estado <strong>Mitigado</strong>, <strong>Resuelto</strong> o <strong>Aceptado (decisión de alcance)</strong>. Los riesgos "Aceptado" siguen siendo riesgos latentes documentados (no eliminados), a reevaluar si el proyecto crece más allá de una actividad de capacitación.</p>
+  </div>
+</div>
+
+<!-- ===================== 10. REFERENCIAS Y GLOSARIO ===================== -->
+<div class="section" id="s10">
+  <h2>10. Referencias y Glosario</h2>
+
+  <div class="subsection">
+    <h3>10.1 Referencias</h3>
+    <ul>
+      <li>Repositorio: <code class="inline">https://github.com/PracticanteDesarrolloVV/reserva-lugares-oficina</code></li>
+      <li>Swagger / OpenAPI: No encontrado.</li>
+      <li>Documentación de APIs externas: portal de Microsoft Entra ID / Azure AD (referenciado en los README de front y API, sin URL específica adicional).</li>
+      <li>Documentos de requisitos: no se encontró un documento de requisitos formal más allá de los README del repositorio y el contexto funcional proporcionado por el usuario.</li>
+      <li>Base de conocimiento completa: carpeta <code class="inline">knowledge/</code> (README, ARCHITECTURE, FRONTEND, BACKEND, DATABASE, API, INTEGRATIONS, SECURITY, DEPLOYMENT, DEPENDENCIES, BUSINESS_RULES, DECISIONS, RISKS, GLOSSARY, CHANGELOG, INFORMATION_GAPS).</li>
+    </ul>
+  </div>
+
+  <div class="subsection">
+    <h3>10.2 Glosario</h3>
+    <table>
+      <tr><th>Término</th><th>Definición</th></tr>
+      <tr><td>App Registration</td><td>Registro de una aplicación en Microsoft Entra ID que le permite autenticar usuarios y/o exponer una API.</td></tr>
+      <tr><td>Cancelación lógica (soft delete)</td><td>Marcar una reserva como cancelada sin borrar el registro de la base de datos.</td></tr>
+      <tr><td>JWT</td><td>Token firmado que representa la identidad de un usuario autenticado, emitido por Azure AD.</td></tr>
+      <tr><td>JWKS</td><td>Conjunto de claves públicas de Azure AD usado para verificar la firma de los JWT.</td></tr>
+      <tr><td>MSAL</td><td>Librería oficial de Microsoft para integrar login con Azure AD.</td></tr>
+      <tr><td>Stored Procedure (SP)</td><td>Rutina almacenada en MySQL que encapsula lógica de negocio; único mecanismo de acceso a datos desde el backend.</td></tr>
+      <tr><td>user_email</td><td>Identificador del usuario, obtenido siempre del claim del token de Azure AD.</td></tr>
+    </table>
+    <p>Glosario completo (17 términos) en <code class="inline">knowledge/GLOSSARY.md</code>.</p>
+  </div>
+</div>
+
+<!-- ===================== ANEXO A ===================== -->
+<div class="section page-break" id="anexoA">
+  <h2>Anexo A — Información que requiere revisión</h2>
+  <p>Consolidado desde <code class="inline">knowledge/INFORMATION_GAPS.md</code>. <strong>Actualización 2026-09-10 (segunda pasada):</strong> el desarrollador respondió los 4 huecos restantes (GAP-11, GAP-13, GAP-14, GAP-15). No se elimina ninguna fila — se conserva el hueco original y se agrega la columna "Resolución" con la respuesta del desarrollador. <strong>Los 15 huecos identificados quedan en estado Resuelto o N/A. No queda ningún hueco en estado "Pendiente".</strong></p>
+  <table class="review-summary-table">
+    <tr><th>ID</th><th>Sección</th><th>Información faltante</th><th>Impacto</th><th>Motivo</th><th>Acción sugerida</th><th>Estado</th><th>Resolución</th></tr>
+    <tr>
+      <td>GAP-01</td><td>7.3 CI/CD</td>
+      <td>No existe pipeline de CI/CD en el repositorio</td>
+      <td class="impact-high">Alto</td>
+      <td>Despliegues dependen de pasos manuales no documentados</td>
+      <td>Confirmar y documentar el proceso de despliegue</td>
+      <td class="estado-resuelto">Resuelto</td>
+      <td>Confirmado por el desarrollador: el despliegue es manual; no hay CI/CD y no está planeado por ahora.</td>
+    </tr>
+    <tr>
+      <td>GAP-02</td><td>8.1 Estrategia de Pruebas</td>
+      <td>No existen pruebas automatizadas en frontend ni backend</td>
+      <td class="impact-high">Alto</td>
+      <td>Alto riesgo de regresiones en lógica de reservas/disponibilidad</td>
+      <td>Incorporar pruebas si el proyecto crece más allá de capacitación</td>
+      <td class="estado-na">N/A</td>
+      <td>Confirmado por el desarrollador: no se realizaron pruebas por ser una aplicación de capacitación. No aplica para el alcance actual.</td>
+    </tr>
+    <tr>
+      <td>GAP-03</td><td>7.2 Procedimiento de Despliegue</td>
+      <td>No hay procedimiento formal de despliegue a QAS/Producción</td>
+      <td class="impact-high">Alto</td>
+      <td>No se puede reproducir ni auditar el despliegue actual</td>
+      <td>Documentar el mecanismo real de build/deploy</td>
+      <td class="estado-resuelto">Resuelto</td>
+      <td>Confirmado por el desarrollador: el despliegue se realiza por medio de Nginx (sirviendo/proxyando la aplicación).</td>
+    </tr>
+    <tr>
+      <td>GAP-04</td><td>6.2 Cifrado y Datos Sensibles</td>
+      <td>Contraseña de BD en texto plano en script SQL versionado</td>
+      <td class="impact-high">Alto</td>
+      <td>Credencial real expuesta en el historial del repositorio</td>
+      <td>Rotar contraseña; remover del script</td>
+      <td class="estado-resuelto">Resuelto</td>
+      <td>Confirmado por el desarrollador: la contraseña ya fue rotada/cambiada. El valor anterior permanece en el historial de git pero ya no es válido.</td>
+    </tr>
+    <tr>
+      <td>GAP-05</td><td>4.3 Reglas de Integridad</td>
+      <td>Contradicción entre README de BD y script real sobre permisos del usuario de aplicación</td>
+      <td class="impact-high">Alto</td>
+      <td>Principio de mínimo privilegio documentado no se cumple</td>
+      <td>Unificar script y README bajo un mismo criterio de permisos</td>
+      <td class="estado-resuelto">Resuelto</td>
+      <td>Aclarado por el desarrollador: los permisos amplios fueron intencionales, para crear el usuario de aplicación durante el despliegue; ya se ejecutó así. No era una contradicción sin resolver, es el diseño confirmado.</td>
+    </tr>
+    <tr>
+      <td>GAP-06</td><td>7.3 CI/CD</td>
+      <td>No se encontró Docker ni infraestructura como código</td>
+      <td class="impact-medium">Medio</td>
+      <td>Dificulta reproducibilidad y portabilidad del despliegue</td>
+      <td>Evaluar contenerización si el proyecto crece</td>
+      <td class="estado-resuelto">Resuelto</td>
+      <td>Mismo caso que GAP-01: despliegue manual vía Nginx, sin Docker planeado por ahora.</td>
+    </tr>
+    <tr>
+      <td>GAP-07</td><td>4.4 Backup y Mantenimiento</td>
+      <td>No hay estrategia de backup/retención para MySQL</td>
+      <td class="impact-medium">Medio</td>
+      <td>Riesgo de pérdida total de datos ante una falla</td>
+      <td>Documentar/implementar política de backup si aplica a futuro</td>
+      <td class="estado-na">N/A</td>
+      <td>Confirmado por el desarrollador: no existe backup ni mantenimiento por el momento; no aplica al alcance actual.</td>
+    </tr>
+    <tr>
+      <td>GAP-08</td><td>7.4 Monitoreo y Observabilidad</td>
+      <td>No hay monitoreo más allá de logs locales</td>
+      <td class="impact-medium">Medio</td>
+      <td>Fallos podrían pasar desapercibidos</td>
+      <td>Evaluar herramienta ligera de monitoreo si el proyecto crece</td>
+      <td class="estado-na">N/A</td>
+      <td>Confirmado por el desarrollador: el proyecto no avanza por ahora más allá de una actividad de capacitación; monitoreo formal no aplica en esta etapa.</td>
+    </tr>
+    <tr>
+      <td>GAP-09</td><td>6.1 Autenticación y Autorización</td>
+      <td>No hay roles/permisos granulares</td>
+      <td class="impact-medium">Medio</td>
+      <td>Podría limitar crecimiento funcional futuro</td>
+      <td>Confirmar con negocio si se requieren roles</td>
+      <td class="estado-na">N/A</td>
+      <td>Confirmado por el desarrollador: no es necesario especificar roles/permisos por ser una actividad de práctica. Decisión de alcance, no pendiente de negocio.</td>
+    </tr>
+    <tr>
+      <td>GAP-10</td><td>3.1 Requisitos Funcionales</td>
+      <td>Inconsistencia entre UI (asume una sola reserva) y backend (permite varias)</td>
+      <td class="impact-medium">Medio</td>
+      <td>Ambigüedad funcional sobre la regla real de negocio</td>
+      <td>Confirmar regla con negocio</td>
+      <td class="estado-resuelto">Resuelto</td>
+      <td>Aclarado por el desarrollador: el sistema no limita al usuario a una sola reserva activa; puede tener varias en fechas distintas. Es comportamiento confirmado, no un bug ni una ambigüedad.</td>
+    </tr>
+    <tr>
+      <td>GAP-11</td><td>6.1 Autenticación y Autorización</td>
+      <td><code class="inline">console.log</code> de depuración sin condicionar por ambiente</td>
+      <td class="impact-medium">Medio</td>
+      <td>Posible fuga de información en logs de cualquier ambiente</td>
+      <td>Remover o condicionar a desarrollo</td>
+      <td class="estado-resuelto">Resuelto</td>
+      <td>Corregido en código: se reemplazó por <code class="inline">logger.debug(...)</code> (winston), con nivel <code class="inline">debug</code> en desarrollo e <code class="inline">info</code> en calidad/producción. Confirmado por lectura directa de <code class="inline">authMiddleware.js</code>; este agente no modificó código.</td>
+    </tr>
+    <tr>
+      <td>GAP-12</td><td>6.4 Gestión de Vulnerabilidades</td>
+      <td>No hay Dependabot/npm audit/SAST/DAST</td>
+      <td class="impact-medium">Medio</td>
+      <td>Vulnerabilidades de dependencias podrían pasar desapercibidas</td>
+      <td>Habilitar Dependabot/Renovate si el proyecto crece</td>
+      <td class="estado-na">N/A</td>
+      <td>Confirmado por el desarrollador: por ser una actividad de capacitación no se van a agregar estas herramientas por ahora.</td>
+    </tr>
+    <tr>
+      <td>GAP-13</td><td>7.1 Entornos</td>
+      <td>No existe ambiente de Producción real (sin <code class="inline">.env.prd</code>)</td>
+      <td class="impact-low">Bajo</td>
+      <td>Indica que producción no está configurada o vive fuera del repo</td>
+      <td>Confirmar existencia/planificación de un ambiente productivo</td>
+      <td class="estado-na">N/A</td>
+      <td>Confirmado por el desarrollador: por ahora el proyecto es solo una actividad de capacitación/QAS; no existe ni está planeado un ambiente de Producción real.</td>
+    </tr>
+    <tr>
+      <td>GAP-14</td><td>Anexo — limpieza de repositorio</td>
+      <td>Archivo vacío "practicante-desarrollo" versionado por error</td>
+      <td class="impact-low">Bajo</td>
+      <td>Ruido en el repositorio</td>
+      <td>Eliminar el archivo</td>
+      <td class="estado-resuelto">Resuelto</td>
+      <td>El archivo ya fue eliminado del working tree; verificado por listado de directorio (ya no existe en <code class="inline">reserva-lugares-oficina-front/</code>).</td>
+    </tr>
+    <tr>
+      <td>GAP-15</td><td>5.1 Endpoints</td>
+      <td>No hay documentación Swagger/OpenAPI</td>
+      <td class="impact-low">Bajo</td>
+      <td>Dificulta exploración interactiva de la API</td>
+      <td>Evaluar agregar swagger-jsdoc/swagger-ui-express</td>
+      <td class="estado-na">N/A</td>
+      <td>El desarrollador decidió no implementarla por ahora. Queda como mejora futura a evaluar si el proyecto crece; no es un pendiente crítico.</td>
+    </tr>
+  </table>
+  <div class="info-box"><strong>Estado final de este Anexo (2026-09-10):</strong> los 15 huecos identificados en la validación de este documento quedan en estado <strong>Resuelto</strong> o <strong>N/A</strong>. No queda ningún hueco en estado "Pendiente" en <code class="inline">knowledge/INFORMATION_GAPS.md</code>.</div>
+</div>
+
+<!-- ===================== 11. APROBACIONES ===================== -->
+<div class="section" id="s11">
+  <h2>11. Aprobaciones</h2>
+  <table>
+    <tr><th>Nombre</th><th>Cargo</th><th>Firma</th><th>Fecha</th></tr>
+    <tr><td>Pendiente</td><td>Pendiente</td><td>Pendiente</td><td>Pendiente</td></tr>
+    <tr><td>Pendiente</td><td>Pendiente</td><td>Pendiente</td><td>Pendiente</td></tr>
+  </table>
+</div>
+
+<div class="footer-note">
+  Documento generado automáticamente a partir del análisis del código fuente y del contexto funcional proporcionado por practicantedes@verdevalle.com — Reserva de Lugares de Oficina, Verde Valle.<br>
+  Este es un documento interno de revisión. No debe distribuirse como entregable final mientras existan marcadores "⚠ Requiere revisión".
+</div>
+
+</div>
+</body>
+</html>
